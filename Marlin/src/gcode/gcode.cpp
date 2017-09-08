@@ -111,14 +111,10 @@ extern void gcode_G18();
 extern void gcode_G19();
 extern void gcode_G20();
 extern void gcode_G21();
-extern void gcode_G26();
 extern void gcode_G27();
-extern void gcode_G28(const bool always_home_all);
-extern void gcode_G29();
 extern void gcode_G30();
 extern void gcode_G31();
 extern void gcode_G32();
-extern void gcode_G33();
 extern void gcode_G38(bool is_38_2);
 extern void gcode_G42();
 extern void gcode_G92();
@@ -145,7 +141,6 @@ extern void gcode_M34();
 extern void gcode_M42();
 extern void gcode_M43();
 extern void gcode_M48();
-extern void gcode_M49();
 extern void gcode_M75();
 extern void gcode_M76();
 extern void gcode_M77();
@@ -221,8 +216,6 @@ extern void gcode_M405();
 extern void gcode_M406();
 extern void gcode_M407();
 extern void gcode_M410();
-extern void gcode_M420();
-extern void gcode_M421();
 extern void gcode_M428();
 extern void gcode_M500();
 extern void gcode_M501();
@@ -234,7 +227,6 @@ extern void gcode_M605();
 extern void gcode_M665();
 extern void gcode_M666();
 extern void gcode_M702();
-extern void gcode_M851();
 extern void gcode_M900();
 extern void gcode_M906();
 extern void gcode_M911();
@@ -344,9 +336,9 @@ void GcodeSuite::process_next_command() {
           break;
       #endif // INCH_MODE_SUPPORT
 
-      #if ENABLED(AUTO_BED_LEVELING_UBL) && ENABLED(UBL_G26_MESH_VALIDATION)
+      #if ENABLED(UBL_G26_MESH_VALIDATION)
         case 26: // G26: Mesh Validation Pattern generation
-          gcode_G26();
+          G26();
           break;
       #endif // AUTO_BED_LEVELING_UBL
 
@@ -357,13 +349,13 @@ void GcodeSuite::process_next_command() {
       #endif // NOZZLE_PARK_FEATURE
 
       case 28: // G28: Home all axes, one at a time
-        gcode_G28(false);
+        G28(false);
         break;
 
       #if HAS_LEVELING
         case 29: // G29 Detailed Z probe, probes the bed at 3 or more points,
                  // or provides access to the UBL System if enabled.
-          gcode_G29();
+          G29();
           break;
       #endif // HAS_LEVELING
 
@@ -387,17 +379,11 @@ void GcodeSuite::process_next_command() {
 
       #endif // HAS_BED_PROBE
 
-      #if PROBE_SELECTED
-
-        #if ENABLED(DELTA_AUTO_CALIBRATION)
-
-          case 33: // G33: Delta Auto-Calibration
-            gcode_G33();
-            break;
-
-        #endif // DELTA_AUTO_CALIBRATION
-
-      #endif // PROBE_SELECTED
+      #if ENABLED(DELTA_AUTO_CALIBRATION)
+        case 33: // G33: Delta Auto-Calibration
+          G33();
+          break;
+      #endif // DELTA_AUTO_CALIBRATION
 
       #if ENABLED(G38_PROBE_TARGET)
         case 38: // G38.2 & G38.3
@@ -512,9 +498,9 @@ void GcodeSuite::process_next_command() {
           break;
       #endif // Z_MIN_PROBE_REPEATABILITY_TEST
 
-      #if ENABLED(AUTO_BED_LEVELING_UBL) && ENABLED(UBL_G26_MESH_VALIDATION)
+      #if ENABLED(UBL_G26_MESH_VALIDATION)
         case 49: // M49: Turn on or off G26 debug flag for verbose output
-          gcode_M49();
+          M49();
           break;
       #endif // AUTO_BED_LEVELING_UBL && UBL_G26_MESH_VALIDATION
 
@@ -899,13 +885,13 @@ void GcodeSuite::process_next_command() {
 
       #if HAS_LEVELING
         case 420: // M420: Enable/Disable Bed Leveling
-          gcode_M420();
+          M420();
           break;
       #endif
 
-      #if ENABLED(MESH_BED_LEVELING) || ENABLED(AUTO_BED_LEVELING_UBL) || ENABLED(AUTO_BED_LEVELING_BILINEAR)
+      #if HAS_MESH
         case 421: // M421: Set a Mesh Bed Leveling Z coordinate
-          gcode_M421();
+          M421();
           break;
       #endif
 
@@ -939,7 +925,7 @@ void GcodeSuite::process_next_command() {
 
       #if HAS_BED_PROBE
         case 851: // M851: Set Z Probe Z Offset
-          gcode_M851();
+          M851();
           break;
       #endif // HAS_BED_PROBE
 

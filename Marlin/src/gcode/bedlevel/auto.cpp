@@ -20,6 +20,25 @@
  *
  */
 
+/**
+ * G29-abl.cpp - Auto Bed Leveling
+ */
+
+#include "../../inc/MarlinConfig.h"
+
+#if OLDSCHOOL_ABL
+
+#include "../gcode.h"
+#include "../../feature/bedlevel/bedlevel.h"
+#include "../../module/motion.h"
+#include "../../module/planner.h"
+#include "../../module/stepper.h"
+#include "../../module/probe.h"
+
+#if ENABLED(LCD_BED_LEVELING) && ENABLED(PROBE_MANUALLY)
+  #include "../../lcd/ultralcd.h"
+#endif
+
 #if ABL_GRID
   #if ENABLED(PROBE_Y_FIRST)
     #define PR_OUTER_VAR xCount
@@ -106,7 +125,7 @@
  *     There's no extra effect if you have a fixed Z probe.
  *
  */
-void gcode_G29() {
+void GcodeSuite::G29() {
 
   // G29 Q is also available if debugging
   #if ENABLED(DEBUG_LEVELING_FEATURE)
@@ -944,3 +963,39 @@ void gcode_G29() {
   if (planner.abl_enabled)
     SYNC_PLAN_POSITION_KINEMATIC();
 }
+
+#if ENABLED(AUTO_BED_LEVELING_BILINEAR)
+
+  /**
+   * M421: Set a single Mesh Bed Leveling Z coordinate
+   *
+   * Usage:
+   *   M421 I<xindex> J<yindex> Z<linear>
+   *   M421 I<xindex> J<yindex> Q<offset>
+   */
+  void GcodeSuite::M421() {
+    int8_t ix = parser.intval('I', -1), iy = parser.intval('J', -1);
+    const bool hasI = ix >= 0,
+               hasJ = iy >= 0,
+               hasZ = parser.seen('Z'),
+               hasQ = !hasZ && parser.seen('Q');
+
+    if (!hasI || !hasJ || !(hasZ || hasQ)) {
+      SERIAL_ERROR_START();
+      SERIAL_ERRORLNPGM(MSG_ERR_M421_PARAMETERS);
+    }
+    else if (!WITHIN(ix, 0, GRID_MAX_POINTS_X - 1) || !WITHIN(iy, 0, GRID_MAX_POINTS_Y - 1)) {
+      SERIAL_ERROR_START();
+      SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
+    }
+    else {
+      z_values[ix][iy] = parser.value_linear_units() + (hasQ ? z_values[ix][iy] : 0);
+      #if ENABLED(ABL_BILINEAR_SUBDIVISION)
+        bed_level_virt_interpolate();
+      #endif
+    }
+  }
+
+#endif // AUTO_BED_LEVELING_BILINEAR
+
+#endif // OLDSCHOOL_ABL

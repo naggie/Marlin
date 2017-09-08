@@ -21,6 +21,35 @@
  */
 
 /**
+ * unified.cpp - Unified Bed Leveling
+ */
+
+#include "../../inc/MarlinConfig.h"
+
+#if ENABLED(AUTO_BED_LEVELING_UBL)
+
+#include "../gcode.h"
+
+#include "../../feature/bedlevel/bedlevel.h"
+
+#if ENABLED(UBL_G26_MESH_VALIDATION)
+  void GcodeSuite::G26() { ubl.G26(); }
+#endif
+
+void GcodeSuite::G29() { ubl.G29(); }
+
+#if ENABLED(UBL_G26_MESH_VALIDATION)
+
+  void GcodeSuite::M49() {
+    ubl.g26_debug_flag ^= true;
+    SERIAL_PROTOCOLPGM("UBL Debug Flag turned ");
+    serialprintPGM(ubl.g26_debug_flag ? PSTR("on.") : PSTR("off."));
+  }
+
+#endif // UBL_G26_MESH_VALIDATION
+
+
+/**
  * M421: Set a single Mesh Bed Leveling Z coordinate
  *
  * Usage:
@@ -29,7 +58,7 @@
  *   M421 C Z<linear>
  *   M421 C Q<offset>
  */
-void gcode_M421() {
+void GcodeSuite::M421() {
   int8_t ix = parser.intval('I', -1), iy = parser.intval('J', -1);
   const bool hasI = ix >= 0,
              hasJ = iy >= 0,
@@ -54,3 +83,5 @@ void gcode_M421() {
   else
     ubl.z_values[ix][iy] = parser.value_linear_units() + (hasQ ? ubl.z_values[ix][iy] : 0);
 }
+
+#endif // AUTO_BED_LEVELING_UBL

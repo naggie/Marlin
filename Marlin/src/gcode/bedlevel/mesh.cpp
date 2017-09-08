@@ -20,23 +20,27 @@
  *
  */
 
+/**
+ * mesh.cpp - Mesh Bed Leveling
+ */
+
+#include "../../inc/MarlinConfig.h"
+
+#if ENABLED(MESH_BED_LEVELING)
+
+#include "../../feature/bedlevel/bedlevel.h"
+
+#include "../gcode.h"
 #include "../queue.h"
+#include "../../module/motion.h"
+#include "../../module/stepper.h"
 
 // Save 130 bytes with non-duplication of PSTR
 void echo_not_entered() { SERIAL_PROTOCOLLNPGM(" not entered."); }
 
-void mbl_mesh_report() {
-  SERIAL_PROTOCOLLNPGM("Num X,Y: " STRINGIFY(GRID_MAX_POINTS_X) "," STRINGIFY(GRID_MAX_POINTS_Y));
-  SERIAL_PROTOCOLPGM("Z offset: "); SERIAL_PROTOCOL_F(mbl.z_offset, 5);
-  SERIAL_PROTOCOLLNPGM("\nMeasured points:");
-  print_2d_array(GRID_MAX_POINTS_X, GRID_MAX_POINTS_Y, 5,
-    [](const uint8_t ix, const uint8_t iy) { return mbl.z_values[ix][iy]; }
-  );
-}
-
 void mesh_probing_done() {
   mbl.set_has_mesh(true);
-  home_all_axes();
+  gcode.home_all_axes();
   set_bed_leveling_enabled(true);
   #if ENABLED(MESH_G28_REST_ORIGIN)
     current_position[Z_AXIS] = LOGICAL_Z_POSITION(Z_MIN_POS);
@@ -45,6 +49,7 @@ void mesh_probing_done() {
     stepper.synchronize();
   #endif
 }
+
 
 /**
  * G29: Mesh-based Z probe, probes a grid and produces a
@@ -67,7 +72,7 @@ void mesh_probing_done() {
  *  v Y-axis  1-n
  *
  */
-void gcode_G29() {
+void GcodeSuite::G29() {
 
   static int mbl_probe_index = -1;
   #if HAS_SOFTWARE_ENDSTOPS
@@ -197,3 +202,34 @@ void gcode_G29() {
 
   report_current_position();
 }
+
+
+/**
+ * M421: Set a single Mesh Bed Leveling Z coordinate
+ *
+ * Usage:
+ *   M421 X<linear> Y<linear> Z<linear>
+ *   M421 X<linear> Y<linear> Q<offset>
+ *   M421 I<xindex> J<yindex> Z<linear>
+ *   M421 I<xindex> J<yindex> Q<offset>
+ */
+void GcodeSuite::M421() {
+  const bool hasX = parser.seen('X'), hasI = parser.seen('I');
+  const int8_t ix = hasI ? parser.value_int() : hasX ? mbl.probe_index_x(RAW_X_POSITION(parser.value_linear_units())) : -1;
+  const bool hasY = parser.seen('Y'), hasJ = parser.seen('J');
+  const int8_t iy = hasJ ? parser.value_int() : hasY ? mbl.probe_index_y(RAW_Y_POSITION(parser.value_linear_units())) : -1;
+  const bool hasZ = parser.seen('Z'), hasQ = !hasZ && parser.seen('Q');
+
+  if (int(hasI && hasJ) + int(hasX && hasY) != 1 || !(hasZ || hasQ)) {
+    SERIAL_ERROR_START();
+    SERIAL_ERRORLNPGM(MSG_ERR_M421_PARAMETERS);
+  }
+  else if (ix < 0 || iy < 0) {
+    SERIAL_ERROR_START();
+    SERIAL_ERRORLNPGM(MSG_ERR_MESH_XY);
+  }
+  else
+    mbl.set_z(ix, iy, parser.value_linear_units() + (hasQ ? mbl.z_values[ix][iy] : 0));
+}
+
+#endif // MESH_BED_LEVELING

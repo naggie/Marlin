@@ -31,6 +31,7 @@
 #include "../module/planner.h"
 #include "../module/stepper.h"
 #include "../module/motion.h"
+#include "../module/probe.h"
 #include "../gcode/gcode.h"
 #include "../gcode/queue.h"
 #include "../module/configuration_store.h"
@@ -168,7 +169,7 @@ uint16_t max_display_update_time = 0;
   #endif
 
   #if ENABLED(MESH_BED_LEVELING) && ENABLED(LCD_BED_LEVELING)
-    #include "../feature/mbl/mesh_bed_leveling.h"
+    #include "../feature/bedlevel/mbl/mesh_bed_leveling.h"
     extern void mesh_probing_done();
   #endif
 
@@ -1016,7 +1017,7 @@ void kill_screen(const char* lcd_msg) {
           const float new_zoffset = zprobe_zoffset + planner.steps_to_mm[Z_AXIS] * babystep_increment;
           if (WITHIN(new_zoffset, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX)) {
 
-            if (planner.abl_enabled)
+            if (leveling_is_active())
               thermalManager.babystep_axis(Z_AXIS, babystep_increment);
 
             zprobe_zoffset = new_zoffset;

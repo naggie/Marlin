@@ -20,11 +20,17 @@
  *
  */
 
-#include "common.h"
+#include "../../inc/MarlinConfig.h"
 
-#if HOTENDS > 1
-  #include "../control/tool_change.h"
-#endif
+#if ENABLED(DELTA_AUTO_CALIBRATION)
+
+#include "../gcode.h"
+#include "../../module/delta.h"
+#include "../../module/probe.h"
+#include "../../module/motion.h"
+#include "../../module/stepper.h"
+#include "../../module/endstops.h"
+#include "../../lcd/ultralcd.h"
 
 /**
  * G33 - Delta '1-4-7-point' Auto-Calibration
@@ -54,7 +60,7 @@
  *   E   Engage the probe for each point
  */
 
-void print_signed_float(const char * const prefix, const float &f) {
+static void print_signed_float(const char * const prefix, const float &f) {
   SERIAL_PROTOCOLPGM("  ");
   serialprintPGM(prefix);
   SERIAL_PROTOCOLCHAR(':');
@@ -62,7 +68,7 @@ void print_signed_float(const char * const prefix, const float &f) {
   SERIAL_PROTOCOL_F(f, 2);
 }
 
-inline void print_G33_settings(const bool end_stops, const bool tower_angles){ // TODO echo these to LCD ???
+static void print_G33_settings(const bool end_stops, const bool tower_angles){ // TODO echo these to LCD ???
   SERIAL_PROTOCOLPAIR(".Height:", DELTA_HEIGHT + home_offset[Z_AXIS]);
   if (end_stops) {
     print_signed_float(PSTR("  Ex"), endstop_adj[A_AXIS]);
@@ -79,7 +85,7 @@ inline void print_G33_settings(const bool end_stops, const bool tower_angles){ /
   }
 }
 
-void G33_cleanup(
+static void G33_cleanup(
   #if HOTENDS > 1
     const uint8_t old_tool_index
   #endif
@@ -94,7 +100,7 @@ void G33_cleanup(
   #endif
 }
 
-void gcode_G33() {
+void GcodeSuite::G33() {
 
   const int8_t probe_points = parser.intval('P', DELTA_CALIBRATION_DEFAULT_POINTS);
   if (!WITHIN(probe_points, 1, 7)) {
@@ -449,3 +455,5 @@ void gcode_G33() {
 
   G33_CLEANUP();
 }
+
+#endif // DELTA_AUTO_CALIBRATION
