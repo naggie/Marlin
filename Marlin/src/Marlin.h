@@ -32,11 +32,8 @@
   #include "gcode/parser.h"
 #endif
 
-#if ENABLED(PRINTCOUNTER)
-  #include "module/printcounter.h"
-#else
-  #include "libs/stopwatch.h"
-#endif
+// PrintCounter or Stopwatch
+#include "module/printcounter.h"
 
 void stop();
 
@@ -233,13 +230,6 @@ extern volatile bool wait_for_heatup;
 
 #if ENABLED(PID_EXTRUSION_SCALING)
   extern int lpq_len;
-#endif
-
-// Print job timer
-#if ENABLED(PRINTCOUNTER)
-  extern PrintCounter print_job_timer;
-#else
-  extern Stopwatch print_job_timer;
 #endif
 
 #if HAS_TEMP_HOTEND || HAS_TEMP_BED
