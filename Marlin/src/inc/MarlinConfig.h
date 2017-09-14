@@ -43,5 +43,6 @@
 #include "../core/types.h"
 #include "../core/utility.h"
 #include "../core/serial.h"
+#include "../libs/buzzer.h"
 
 #endif // MARLIN_CONFIG_H

@@ -34,10 +34,6 @@
 
 #include "../Marlin.h"
 
-#if HAS_BUZZER && DISABLED(LCD_USE_I2C_BUZZER)
-  #include "../libs/buzzer.h"
-#endif
-
 #if ENABLED(PRINTCOUNTER)
   #include "../module/printcounter.h"
   #include "../libs/duration_t.h"
