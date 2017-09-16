@@ -448,10 +448,6 @@ void set_axis_is_at_home(const AxisEnum axis) {
  ***************** GCode Handlers *****************
  **************************************************/
 
-#if ENABLED(NOZZLE_CLEAN_FEATURE)
-  #include "gcode/feature/clean/G12.h"
-#endif
-
 #if ENABLED(CNC_WORKSPACE_PLANES)
   #include "gcode/geometry/G17-G19.h"
 #endif
