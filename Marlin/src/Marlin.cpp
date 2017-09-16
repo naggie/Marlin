@@ -448,8 +448,6 @@ void set_axis_is_at_home(const AxisEnum axis) {
  ***************** GCode Handlers *****************
  **************************************************/
 
-#include "gcode/motion/G4.h"
-
 #if ENABLED(BEZIER_CURVE_SUPPORT)
   #include "gcode/motion/G5.h"
 #endif
