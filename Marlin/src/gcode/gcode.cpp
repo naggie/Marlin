@@ -113,7 +113,6 @@ void GcodeSuite::dwell(millis_t time) {
 //
 // Placeholders for non-migrated codes
 //
-extern void gcode_G27();
 extern void gcode_G30();
 extern void gcode_G31();
 extern void gcode_G32();
@@ -342,7 +341,7 @@ void GcodeSuite::process_next_command() {
 
       #if ENABLED(NOZZLE_PARK_FEATURE)
         case 27: // G27: Nozzle Park
-          gcode_G27();
+          G27();
           break;
       #endif // NOZZLE_PARK_FEATURE
 
