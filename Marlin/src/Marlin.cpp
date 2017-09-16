@@ -444,8 +444,6 @@ void set_axis_is_at_home(const AxisEnum axis) {
  ***************** GCode Handlers *****************
  **************************************************/
 
-#include "gcode/geometry/G92.h"
-
 #if HAS_RESUME_CONTINUE
   #include "gcode/lcd/M0_M1.h"
 #endif
