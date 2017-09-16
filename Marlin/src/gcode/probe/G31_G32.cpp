@@ -20,12 +20,31 @@
  *
  */
 
+#include "../../inc/MarlinConfig.h"
+
+#if ENABLED(Z_PROBE_SLED)
+
+#include "../gcode.h"
+#include "../../module/probe.h"
+
+/**
+ * G30: Do a single Z probe at the current XY
+ *
+ * Parameters:
+ *
+ *   X   Probe X position (default current X)
+ *   Y   Probe Y position (default current Y)
+ *   S0  Leave the probe deployed
+ */
+
 /**
  * G31: Deploy the Z probe
  */
-void gcode_G31() { DEPLOY_PROBE(); }
+void GcodeSuite::G31() { DEPLOY_PROBE(); }
 
 /**
  * G32: Stow the Z probe
  */
-void gcode_G32() { STOW_PROBE(); }
+void GcodeSuite::G32() { STOW_PROBE(); }
+
+#endif // Z_PROBE_SLED
