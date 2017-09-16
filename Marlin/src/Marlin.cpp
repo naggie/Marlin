@@ -209,10 +209,6 @@ static millis_t stepper_inactive_time = (DEFAULT_STEPPER_DEACTIVE_TIME) * 1000UL
   millis_t lastUpdateMillis;
 #endif
 
-#if ENABLED(CNC_WORKSPACE_PLANES)
-  static WorkspacePlane workspace_plane = PLANE_XY;
-#endif
-
 /**
  * ***************************************************************************
  * ******************************** FUNCTIONS ********************************
@@ -447,10 +443,6 @@ void set_axis_is_at_home(const AxisEnum axis) {
 /**************************************************
  ***************** GCode Handlers *****************
  **************************************************/
-
-#if ENABLED(CNC_WORKSPACE_PLANES)
-  #include "gcode/geometry/G17-G19.h"
-#endif
 
 #if ENABLED(INCH_MODE_SUPPORT)
   #include "gcode/units/G20_G21.h"
