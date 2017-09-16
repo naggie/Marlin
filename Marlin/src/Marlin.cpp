@@ -444,11 +444,8 @@ void set_axis_is_at_home(const AxisEnum axis) {
  ***************** GCode Handlers *****************
  **************************************************/
 
-#if HAS_BED_PROBE
-  #include "gcode/probe/G30.h"
-  #if ENABLED(Z_PROBE_SLED)
-    #include "gcode/probe/G31_G32.h"
-  #endif
+#if ENABLED(Z_PROBE_SLED)
+  #include "gcode/probe/G31_G32.h"
 #endif
 
 #if ENABLED(G38_PROBE_TARGET)
