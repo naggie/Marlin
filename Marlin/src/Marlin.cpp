@@ -444,10 +444,6 @@ void set_axis_is_at_home(const AxisEnum axis) {
  ***************** GCode Handlers *****************
  **************************************************/
 
-#if ENABLED(INCH_MODE_SUPPORT)
-  #include "gcode/units/G20_G21.h"
-#endif
-
 #if ENABLED(NOZZLE_PARK_FEATURE)
   #include "gcode/feature/pause/G27.h"
 #endif
